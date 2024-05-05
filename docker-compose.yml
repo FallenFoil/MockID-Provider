@@ -1,0 +1,55 @@
+services:
+  web:
+    build: ./client
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    networks:
+      - mynet
+    hostname: web
+    environment:
+      - DB_HOST=database-server
+    volumes:
+      - ./client/config.ini:/var/www/html/config.ini
+    develop:
+      watch:
+        - action: rebuild
+          path: ./client
+  server:
+    build: ./server
+    ports:
+      - "9000:9000"
+    networks:
+      - mynet
+    hostname: openid
+  # db:
+  #   image: postgres:15
+  #   restart: always
+  #   hostname: database-server
+  #   environment:
+  #     - POSTGRES_DB=postgres
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgreswithoutwarnings
+  #   ports:
+  #     - 5432:5432
+  #   volumes:
+  #     - ./db:/tmp/sql
+  #   networks:
+  #     - mynet
+  # adminer:
+  #   image: adminer:latest
+  #   ports:
+  #     - 9090:8080
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - ADMINER_DEFAULT_SERVER=database-server
+  #     - ADMINER_DESIGN=galkaev
+  #   networks:
+  #     - mynet
+  #   logging:
+  #     driver: none
+networks:
+  mynet:
+    driver: bridge
